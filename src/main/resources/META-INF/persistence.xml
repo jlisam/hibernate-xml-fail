@@ -5,6 +5,9 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 	
 	<persistence-unit name="example.fwb.data.foo" transaction-type="RESOURCE_LOCAL">
+		<!-- explicitly request hibernate, though it's the default and works without -->
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		
 		<!-- don't use default "orm.xml" or it will poison the 'bar' unit below, too -->
 		<mapping-file>META-INF/orm-foo.xml</mapping-file>
 		
@@ -18,6 +21,9 @@
 	</persistence-unit>
 	
 	<persistence-unit name="example.fwb.data.bar" transaction-type="RESOURCE_LOCAL">
+		<!-- explicitly request hibernate, though it's the default and works without -->
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		
 		<class>example.fwb.data.BarThing</class>
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
@@ -27,4 +33,20 @@
 			<property name="hibernate.show_sql" value="true" />
 		</properties>
 	</persistence-unit>
+	
+	<persistence-unit name="example.fwb.data.foo.eclipselink" transaction-type="RESOURCE_LOCAL">
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		
+		<!-- don't use default "orm.xml" or it will poison the 'bar' unit, too -->
+		<mapping-file>META-INF/orm-foo.xml</mapping-file>
+		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<properties>
+			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:dbFooEclipseLink;create=true" />
+			<property name="javax.persistence.schema-generation.database.action" value="drop-and-create" />
+			<property name="hibernate.show_sql" value="true" />
+		</properties>
+	</persistence-unit>
+	
 </persistence>

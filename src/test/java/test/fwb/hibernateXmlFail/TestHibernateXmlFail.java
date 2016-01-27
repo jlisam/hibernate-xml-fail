@@ -4,36 +4,54 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
+import javax.persistence.Query;
 
-import org.hibernate.AnnotationException;
+//import org.hibernate.AnnotationException;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import example.fwb.data.BarThing;
+import example.fwb.data.FooThing;
 
 public class TestHibernateXmlFail {
+	static final Logger LOG = LoggerFactory.getLogger(TestHibernateXmlFail.class);
+	
 	static final String
 		FOO = "example.fwb.data.foo",
-		BAR = "example.fwb.data.bar";
+		BAR = "example.fwb.data.bar",
+		FOO_EL = "example.fwb.data.foo.eclipselink";
 	
 	/**
 	 * this test passes, which proves that hibernate is buggy.
 	 * the FOO persistence-unit is correctly configured,
 	 * yet Hibernate cannot find FooThing's identifier.
 	 */
-	@Test(expected=PersistenceException.class)
+	@Test
 	public void testFoo() {
 		try {
 			Persistence.createEntityManagerFactory(FOO);
 			
 			// unfortunately, it doesn't get here
+			LOG.error("THE HIBERNATE BUG HAS BEEN FIXED!");
 			Assert.fail();
 		} catch (PersistenceException pe) {
 			Assert.assertEquals("Unable to build entity manager factory", pe.getMessage());
-			Assert.assertTrue(pe.getCause() instanceof AnnotationException);
+			Assert.assertEquals("org.hibernate.AnnotationException", pe.getCause().getClass().getName());
 			Assert.assertEquals("No identifier specified for entity: example.fwb.data.FooThing", pe.getCause().getMessage());
-			throw pe;
 		}
+	}
+	
+	@Test
+	public void testFooEclipseLink() {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(FOO_EL);
+		
+		FooThing foo1 = new FooThing();
+		foo1.anIdentifier = "firstId";
+		foo1.theName = "the first Foo";
+		
+		genericTest(emf, foo1, "firstId");
 	}
 	
 	/**
@@ -44,17 +62,29 @@ public class TestHibernateXmlFail {
 	@Test
 	public void testBar() {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory(BAR);
-		EntityManager em = emf.createEntityManager();
 		
 		BarThing bar1 = new BarThing();
 		bar1.theIdentifier = "firstId";
 		bar1.aDescription = "the first";
 		
+		genericTest(emf, bar1, "firstId");
+	}
+	
+	private <T> void genericTest(EntityManagerFactory emf, T thing, Object id) {
+		EntityManager em = emf.createEntityManager();
+		Class<?> cls = thing.getClass();
+		Query q = em.createQuery(String.format(
+				"select x from %s x",
+				cls.getSimpleName()));
+		
+		Assert.assertNull(em.find(cls, id));
+		Assert.assertEquals(0, q.getResultList().size());
+		
 		em.getTransaction().begin();
-		em.persist(bar1);
+		em.persist(thing);
 		em.getTransaction().commit();
 		
-		Assert.assertSame(bar1, em.find(BarThing.class, "firstId"));
-		Assert.assertEquals(1, em.createQuery("from BarThing").getResultList().size());
+		Assert.assertSame(thing, em.find(cls, id));
+		Assert.assertEquals(1, q.getResultList().size());
 	}
 }
