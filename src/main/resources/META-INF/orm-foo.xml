@@ -3,11 +3,11 @@
 	xmlns="http://java.sun.com/xml/ns/persistence/orm"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd">
-	
-	<entity class="example.fwb.data.FooThing">
+
+	<entity class="example.fwb.data.FooThing" access="FIELD">
 		<table name="fwb_foo" />
 		<attributes>
-			
+
 			<!--
 			here is a correctly-configured identifier,
 			which hibernate incorrectly fails to recognize.
@@ -16,7 +16,7 @@
 			<id name="anIdentifier">
 				<column name="some_id" length="128" />
 			</id>
-			
+
 			<basic name="theName">
 				<column name="the_name" length="128" />
 			</basic>
