@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings version="2.0"
+	xmlns="http://java.sun.com/xml/ns/persistence/orm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd">
+	
+	<entity class="example.fwb.data.FooThing">
+		<table name="fwb_foo" />
+		<attributes>
+			
+			<!--
+			here is a correctly-configured identifier,
+			which hibernate incorrectly fails to recognize.
+			"No identifier specified for entity: example.fwb.data.FooThing"
+			-->
+			<id name="anIdentifier">
+				<column name="some_id" length="128" />
+			</id>
+			
+			<basic name="theName">
+				<column name="the_name" length="128" />
+			</basic>
+		</attributes>
+	</entity>
+</entity-mappings>
