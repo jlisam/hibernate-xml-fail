@@ -38,6 +38,7 @@ public class TestHibernateXmlFail {
 			Assert.fail();
 		} catch (PersistenceException pe) {
 			Assert.assertEquals("Unable to build entity manager factory", pe.getMessage());
+			// confirm it's really hibernate
 			Assert.assertEquals("org.hibernate.AnnotationException", pe.getCause().getClass().getName());
 			Assert.assertEquals("No identifier specified for entity: example.fwb.data.FooThing", pe.getCause().getMessage());
 		}
@@ -46,6 +47,8 @@ public class TestHibernateXmlFail {
 	@Test
 	public void testFooEclipseLink() {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory(FOO_EL);
+		// confirm it's really EclipseLink
+		Assert.assertEquals("org.eclipse.persistence.internal.jpa.EntityManagerFactoryImpl", emf.getClass().getName());
 		
 		FooThing foo1 = new FooThing();
 		foo1.anIdentifier = "firstId";
@@ -62,6 +65,8 @@ public class TestHibernateXmlFail {
 	@Test
 	public void testBar() {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory(BAR);
+		// confirm it's really hibernate
+		Assert.assertEquals("org.hibernate.jpa.internal.EntityManagerFactoryImpl", emf.getClass().getName());
 		
 		BarThing bar1 = new BarThing();
 		bar1.theIdentifier = "firstId";
