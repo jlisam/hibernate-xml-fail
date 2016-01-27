@@ -44,19 +44,6 @@ public class TestHibernateXmlFail {
 		}
 	}
 	
-	@Test
-	public void testFooEclipseLink() {
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory(FOO_EL);
-		// confirm it's really EclipseLink
-		Assert.assertEquals("org.eclipse.persistence.internal.jpa.EntityManagerFactoryImpl", emf.getClass().getName());
-		
-		FooThing foo1 = new FooThing();
-		foo1.anIdentifier = "firstId";
-		foo1.theName = "the first Foo";
-		
-		genericTest(emf, foo1, "firstId");
-	}
-	
 	/**
 	 * an example using annotation-id instead of xml-id,
 	 * but otherwise analogous, suggesting hibernate itself is working,
@@ -73,6 +60,19 @@ public class TestHibernateXmlFail {
 		bar1.aDescription = "the first";
 		
 		genericTest(emf, bar1, "firstId");
+	}
+	
+	@Test
+	public void testFooEclipseLink() {
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory(FOO_EL);
+		// confirm it's really EclipseLink
+		Assert.assertEquals("org.eclipse.persistence.internal.jpa.EntityManagerFactoryImpl", emf.getClass().getName());
+		
+		FooThing foo1 = new FooThing();
+		foo1.anIdentifier = "firstId";
+		foo1.theName = "the first Foo";
+		
+		genericTest(emf, foo1, "firstId");
 	}
 	
 	private <T> void genericTest(EntityManagerFactory emf, T thing, Object id) {
